@@ -8,17 +8,31 @@ These datasets are derived from uploads to Dryad, R datasets, and my own persona
 Citations for each of the datasets are found in the this same folder. 
 
 In this repository, each lab module is uploaded as its own file in .docx format. 
+
 Lab1Generic.docx - Installing R and R Studio, installing foundational packages
+
 Lab2Generic.docx - A tour of R Studio, executing commands, reading data
+
 Lab3Generic.docx - Data Types, Conversion, and Manipulation; The Pipe, dplyr
+
 Lab4Generic.docx - dplyr, Filtering, Grouping, Summarizing, Arranging, Selecting
+
 Lab5Generic.docx - Visualization, ggplot2 (Boxplots, Histograms), Colors
+
 Lab6Generic.docx - More ggplot2 (Scatter Plots, Facets, Coord Flips, Chart Labels)
+
 Lab7Generic.docx - Confidence Intervals, t-Tests in R, Multiple Tests
+
 Lab8Generic.docx - More dplyr (Mutate and Data Transformations)
+
 Lab9Generic.docx - More ggplot2 (geom_jitter, violin, etc.)
+
 Lab10Generic.docx - ANOVA in R
+
 Lab11Generic.docx - Data Manipulation and Cleaning Interlude, tidyr
+
 Lab12Generic.docx - Regression in R, Plotting Regression Lines in ggplot2
+
 Lab13Generic.docx - Programming, Scripting, and Reproducibility 
+
 Lab14Generic.docx - Explore User-Generated R Packages 
