@@ -1,0 +1,167 @@
+
+```{r libraries}
+
+library(tidyverse)
+library(magrittr)
+
+```
+
+```{r 1}
+Fungus <- read_csv("Dryad_Eldridge_Ecology.csv",
+                   col_names = TRUE) %>%
+  select(Community,
+         Site,
+         Patch,
+         Plant_Cov,
+         PlantRich,
+         pH,
+         Cow,
+         Sheep,
+         Roo,
+         Rabb,
+         ACTINO2:FungalShannons) %>%
+  rename(PercentPlantCover = Plant_Cov,
+         PlantRichness = PlantRich,
+         CowDung = Cow,
+         SheepDung = Sheep,
+         KangarooDung = Roo,
+         RabbitDung = Rabb,
+         ActinobacterialAbundance = ACTINO2,
+         AlphaproteobacterialAbundance = AlphaProteo2,
+         BacterialRichness = BacterialShannons,
+         AscomycetesAbundance = ASCO2,
+         BasidiomycetesAbundance = BASI2,
+         FungalRichness = FungalShannons) %>%
+  mutate(Community = as_factor(Community),
+         Site = as_factor(Site),
+         Patch = as_factor(Patch))
+
+Fungus %>%
+  str()
+```
+
+```{r 2}
+
+ggplot(data = Fungus,                         # Tell R that to start a section of ggplot code, and indicate the data object we want
+       mapping = aes(x = PlantRichness)) +    # We then tell R which variables in that data object will be used for what, then then '+'
+  geom_histogram()                            # + pipes that information into a second ggplot command (layer) indicating we want a histogram 
+
+```
+
+```{r 3}
+
+ggplot(data = Fungus) +                             # Start the ggplot code, indicate the data object, and pipe immediately into the geom
+  geom_histogram(mapping = aes(x = PlantRichness))  # Supply the variable information within the geom
+
+```
+
+```{r 4}
+
+Fungus %>%                                         # Start with our data and pipe it into ggplot
+  ggplot() +                                       # ggplot knows our data from the pipe, this is just here to tell R so start ggplot code
+  geom_histogram(mapping = aes(x = PlantRichness)) # We then add the histogram, supplying the data variable here 
+
+```
+
+```{r 5}
+Fungus %>%
+  ggplot() +
+  geom_histogram(mapping = aes(x = PlantRichness),
+                 binwidth = 2,                       # We can specify a bin width if we think it will be better
+                 fill = "Red",                       # The fill option changes the color of the bars
+                 color = "Blue")                     # The color option changes the color of the line areound the bars 
+```
+
+```{r 6}
+Fungus %>%
+  ggplot() +
+  geom_histogram(mapping = aes(x = PlantRichness),
+                 binwidth = 2,    
+                 fill = "#4DA6FF",                       # You can ask directly for an RGB color code, here "cornflower blue"
+                 color = "Blue")                     
+```
+
+```{r 7}
+Fungus %>%
+  ggplot() +
+  geom_boxplot(mapping = aes(y = FungalRichness))  # You can specify only a y variable if you want the summary statistics on the variable 
+                                                   # as a whole
+```
+
+```{r 8}
+Fungus %>%
+  ggplot() +
+  geom_boxplot(mapping = aes(x = Patch,
+                             y = FungalRichness))
+```
+
+```{r 9}
+Fungus %>%
+  ggplot() +
+  geom_boxplot(mapping = aes(x = Patch,
+                             y = FungalRichness),
+               fill = "Blue",                               # We can change the fill color of boxplots just like we did for histograms
+               color = "gold1")                             # Same for the outline color
+                                                            # Note the location of the fill and color options, both of them are outside 
+                                                            # of the aes() parentheses (aes stands for aesthetics)
+```
+
+```{r 10}
+Fungus %>%
+  ggplot() +
+  geom_boxplot(mapping = aes(x = Patch,
+                             y = FungalRichness,
+                             fill = Patch),      # You can also color by a variable, but there the "fill" must come inside the aes()
+               color = "Gold3")                  # We can still change the outline by using the color option outside aes()
+```
+
+```{r 11}
+install.packages("RColorBrewer")
+library(RColorBrewer)                              # These colors are not part of base R, so I need to call the library 
+Fungus %>%
+  ggplot() +
+  geom_boxplot(mapping = aes(x = Patch,
+                             y = FungalRichness,
+                             fill = Patch)) +      # We still need to tell ggplot to fill according to the patch variable, then pipe (+)
+  scale_fill_brewer(palette = "Pastel2")           # to another layer of code that indicates a species color palette
+
+```
+
+```{r 12}
+Fungus
+
+Fungus %>%
+  ggplot() +
+  geom_histogram(mapping = aes(x = pH),
+                 binwidth = 0.1)
+
+
+Fungus %>%
+  ggplot() +
+  geom_boxplot(mapping = aes(x = Community,
+                             y = ActinobacterialAbundance,
+                             fill = Community))
+
+Fungus %>%
+  filter(PercentPlantCover < 25) %>%
+  ggplot() +
+  geom_boxplot(mapping = aes(x = Patch,
+                             y = PercentPlantCover,
+                             fill = Patch))
+
+Fungus %>%
+  group_by(Community,
+           Site) %>%
+  summarize(SiteKangDung = mean(KangarooDung)) %>%
+  ggplot() +
+  geom_boxplot(mapping = aes(x = Community,
+                             y = SiteKangDung,
+                             fill = Community))
+
+```
+
+```{r session info}
+
+sessionInfo()
+
+```

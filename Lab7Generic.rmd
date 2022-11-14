@@ -1,0 +1,153 @@
+---
+title: "Lab3 Tuesday"
+output: html_notebook
+---
+
+```{r libraries}
+
+library(tidyverse)
+library(magrittr)
+
+```
+
+```{r 1}
+
+IrisData <- read_csv("Iris.csv",
+                     col_names = TRUE)
+
+```
+
+```{r 2}
+IrisData %>%
+  ggplot() +
+  geom_boxplot(mapping = aes(x = Species,
+                             y = Petal.Length,
+                             fill = Species))
+```
+
+```{r 3}
+
+IrisOne <- IrisData %>%            # Need to make a new data object that has only the variables and observations necessary  
+  select(Species,                  # Select only the two variables that we need 
+         Petal.Length) %>%
+  filter(Species == "setosa")      # Filter to get only the observations we need, observations from a single species 
+
+                                   # Notice that we cannot pipe into this, we are outside of the tidyverse   
+t.test(x = IrisOne$Petal.Length,   # The $ is a way to define variables within a data set. The syntax is DataFrameName$VariableName
+       y = NULL,                   # If testing the difference between tow means, the other data, otherwise set as null
+       mu = 0,                     # Testing if the mean is different than zero (mu = true value of the mean)
+       alternative = "two.sided",  # A two sided test 
+       conf.level = 0.95)          # With a confidence level of 0.95
+```
+
+```{r 3b}
+
+IrisOne <- IrisData %>%            # Need to make a new data object that has only the variables and observations necessary  
+  select(Species,                  # Select only the two variables that we need 
+         Petal.Length) %>%
+  filter(Species == "setosa")      # Filter to get only the observations we need, observations from a single species 
+
+                                   # Notice that we cannot pipe into this, we are outside of the tidyverse   
+t.test(x = IrisOne$Petal.Length,   # The $ is a way to define variables within a data set. The syntax is DataFrameName$VariableName
+       y = NULL,                   # If testing the difference between tow means, the other data, otherwise set as null
+       mu = 2,                     # Testing if the mean is different than two (mu = true value of the mean)
+       alternative = "two.sided",  # A two sided test 
+       conf.level = 0.95)          # With a confidence level of 0.95
+```
+
+```{r 4}
+
+IrisTwo <- IrisData %>%                                          # A new data object that has only the variables and observations necessary
+  select(Species,                                                # Select only the two variables that we need
+         Petal.Length) %>%
+  filter(Species != "versicolor")                                # Filter to get only the observations we need, observations from a two species 
+
+t.test(x = IrisTwo$Petal.Length[IrisTwo$Species == "setosa"],    # Define the first group of observations, petal lengths for species setosa 
+       y = IrisTwo$Petal.Length[IrisTwo$Species == "virginica"], # Define the first group of observations, petal lengths for species virginica
+       alternative = "two.sided",                                # A two sided test 
+       paired = FALSE,                                           # The observations are not paired
+       conf.level = 0.95)                                        # With a confidence level of 0.95
+```
+
+```{r 5}
+                                                 # Notice we are using a different function, no need to modify our data beforehand
+pairwise.t.test(x = IrisData$Petal.Length,       # The first variable is the vector of observations
+                g = IrisData$Species,            # The second variable is the vector containing the groupings
+                alternative = "two.sided",       # All the tests in the series are two sided
+                conf.level = 0.95,               # Final confidence level desired
+                p.adjust.method = "bonferroni")  # Our adjustment for multiple comparisons/tests is the Bonferroni adjustment 
+
+```
+
+```{r 6}
+IrisData %>%
+  ggplot() +
+  geom_histogram(mapping = aes(x = Petal.Length)) +
+  facet_wrap(~ Species)
+```
+
+```{r 7}
+var(IrisData$Petal.Length[IrisData$Species == "setosa"])
+var(IrisData$Petal.Length[IrisData$Species == "versicolor"])
+var(IrisData$Petal.Length[IrisData$Species == "virginica"])
+```
+
+```{r 8}
+IrisData %>%
+  mutate(Species = as_factor(Species)) %>%
+  summary()
+```
+
+```{r 9}
+ToothData <- read_csv("ToothGrowth.csv",
+                      col_names = TRUE)
+
+ToothData
+
+ToothDataMod <- ToothData %>%
+  filter(dose == "0.5",
+         supp == "OJ")
+
+ToothDataMod
+
+t.test(x = ToothDataMod$len,   
+       mu = 0,                     
+       alternative = "two.sided",  
+       conf.level = 0.95)          
+
+ToothDataMod %>%
+  ggplot() +
+  geom_histogram(mapping = aes(x = len),
+                 binwidth = 2)
+
+ToothDataMod %>%
+  mutate(supp = as_factor(supp)) %>%
+  summary()
+
+```
+
+```{r session info}
+sessionInfo()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,23 @@
+
+```{r}
+firstobject + secondobject
+
+thirdobject
+```
+
+```{r read data}
+library(tidyverse)
+read_csv("lab1data.csv", 
+         col_names = TRUE)
+```
+
+```{r chunk 3}
+lab1data2 <- read_csv("lab1data2.csv", 
+                     col_names = FALSE)
+
+lab1data2
+
+write_csv(iris,
+          "Iris")
+
+```

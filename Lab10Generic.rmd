@@ -1,0 +1,133 @@
+
+```{r}
+library(tidyverse)
+library(magrittr)
+```
+
+```{r 1}
+Fungus <- read_csv("Dryad_Eldridge_Ecology.csv",
+                      col_names = TRUE) %>%
+  mutate(LogNAG = log(NAG),
+         Community = as_factor(Community),
+         Patch = as_factor(Patch)) %>%
+  filter(LogNAG > 0) %>%
+  select(Community,
+         Patch,
+         LogNAG)
+```
+
+```{r 2}
+Fungus %>%
+  ggplot() +
+  geom_histogram(mapping = aes(x = LogNAG)) +
+  facet_wrap(~ Community)
+```
+
+```{r 3}
+Fungus %>%
+  ggplot() + 
+  geom_boxplot(mapping = aes(x = Community,
+                             y = LogNAG))
+```
+
+```{r 4}
+ANOVA1way <- aov(Fungus$LogNAG ~ Fungus$Community)  
+
+anova(ANOVA1way)
+```
+
+```{r 5}
+Fungus %>%
+  ggplot() +
+  geom_histogram(mapping = aes(x = LogNAG)) +
+  facet_wrap(~ Patch)
+
+Fungus %>%
+  ggplot() + 
+  geom_boxplot(mapping = aes(x = Patch,
+                             y = LogNAG))
+```
+
+```{r 6}
+ANOVA2way <- aov(Fungus$LogNAG ~ Fungus$Community + Fungus$Patch)
+
+anova(ANOVA2way)
+```
+
+```{r 7}
+
+# Here there are only three groups so it makes sense to test them all
+# In cases where there are many groups, you may only want to test the groups most likely to be different
+
+pairwise.t.test(x = Fungus$LogNAG,
+                g = Fungus$Community,
+                alternative =  "two.sided",
+                conf.level = 0.95,
+                p.adjust.method = "bonferroni")
+```
+
+```{r 8}
+ANOVAinteraction <- aov(Fungus$LogNAG ~ Fungus$Community * Fungus$Patch) # Notice the asterix and on the plus sign
+
+anova(ANOVAinteraction)
+```
+
+```{r 9}
+read_csv("Triplaris_Data.csv",
+         col_names = TRUE) %>%
+  select(AcceptedName,
+         Country,
+         LaminaWidth1) %>%
+  na.omit() %>%
+  filter(AcceptedName == "Triplaris americana",
+         Country != "PANAMA",
+         Country != "BOLIVIA",
+         Country != "ECUADOR") %>%
+  rename(SpeciesName = "AcceptedName",
+         LeafWidth = "LaminaWidth1") %>%
+  mutate(SpeciesName = as_factor(SpeciesName),
+         Country = as_factor(Country)) %>%
+  write_csv("Triplaris_Lab4.csv")
+
+Triplaris_Lab4 <- read_csv("Triplaris_Lab4.csv", 
+                           col_names = TRUE)
+
+ANOVAhw <- aov(Triplaris_Lab4$LeafWidth ~ Triplaris_Lab4$Country)  
+
+anova(ANOVAhw)
+
+
+read_csv("Triplaris_Lab4.csv",
+         col_names = TRUE) %>%
+  ggplot() +
+  geom_boxplot(mapping = aes(x = Country, 
+                             y = LeafWidth)) + 
+  coord_flip()
+
+read_csv("Triplaris_Lab4.csv",
+         col_names = TRUE) %>%
+  ggplot() +
+  geom_histogram(mapping = aes(x = LeafWidth),
+                             fill = "black",
+                 binwidth = 10) +
+  facet_wrap(~ Country)
+
+
+```
+
+```{r session info}
+sessionInfo()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+

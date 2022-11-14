@@ -1,0 +1,176 @@
+
+```{r}
+
+library(tidyverse)
+library(magrittr)
+
+```
+
+```{r 1}
+Triplaris <- read_csv("Triplaris_Data.csv",
+                      col_names = TRUE)
+
+FishData <- read_csv("Sebastes_raw_morphology.csv",
+                     col_names = TRUE)
+
+Fungus <- read_csv("Dryad_Eldridge_Ecology.csv",
+                   col_names = TRUE)
+```
+
+```{r 2}
+Triplaris %>%
+  select(LaminaLength1,                              # If we are going to use na.omit() we want to limit the number of variables so that as little
+         LaminaWidth1,                               # data get removed as possible
+         AcceptedName) %>%
+  na.omit() %>%                                      # Remove the missing observations
+  ggplot() +                                         # Pipe into ggplot
+  geom_point(mapping = aes(x = LaminaWidth1,         # Scatter plot with leaf width as x
+                           y = LaminaLength1,        # And leaf length as y
+                           color = AcceptedName))    # Add colors just to make it look a little nicer 
+```
+
+```{r 3}
+Triplaris %>% 
+  select(LaminaLength1,                            # Remember that none of this is saved unless we make a new data object
+         LaminaWidth1,  
+         AcceptedName) %>%
+  na.omit() %>%
+  lm(formula = LaminaLength1 ~ LaminaWidth1) %>%   # Building the linear model (the regression)
+  summary()
+```
+
+```{r 4}
+Triplaris %>%
+  select(LaminaLength1,                               # Again, we have to repeat this prep work unless we save a new data object
+         LaminaWidth1,
+         AcceptedName) %>%
+  na.omit() %>% 
+  ggplot() +                                          # Pipe into ggplot
+  geom_point(mapping = aes(x = LaminaWidth1,          # Scatter plot with leaf width as x
+                           y = LaminaLength1,         # And leaf length as y
+                           color = AcceptedName)) +   # Keep the colors by species name
+  geom_smooth(mapping = aes(x = LaminaWidth1,         # Add a new geom for the regression line, geom_smooth(), and give the same aes() as the scatter plot
+                            y = LaminaLength1), 
+              method = "lm",                          # The kind of line we want is obe built by the lm function in R
+              formula = y ~ x,                        # And we want a simple linear relationship between x and y
+              se = FALSE)                             # By default, geom_smooth() plots error estimations around the line, this removes that
+```
+
+```{r 5}
+Triplaris %>%
+  select(LaminaLength1,                          
+         LaminaWidth1,
+         AcceptedName) %>%
+  na.omit() %>% 
+  ggplot(mapping = aes(x = LaminaWidth1,              # Supply our aes() information in the initial ggplot()
+                       y = LaminaLength1,       
+                           color = AcceptedName)) +   
+  geom_point() +                                      # No need to supply it again in geom_point(), ggplot assumes it will use data from initial ggplot()
+  geom_smooth(mapping = aes(x = LaminaWidth1,       
+                            y = LaminaLength1), 
+              method = "lm",                        
+              formula = y ~ x,                     
+              se = FALSE)                          
+```
+
+```{r 6}
+Triplaris %>%
+  select(LaminaLength1,                          
+         LaminaWidth1,
+         AcceptedName) %>%
+  na.omit() %>% 
+  ggplot(mapping = aes(x = LaminaWidth1,              # Supply our aes() information in the initial ggplot()
+                       y = LaminaLength1,       
+                           color = AcceptedName)) +   
+  geom_point() +                                      # No need to supply it again in geom_point(), ggplot assumes it will use data from initial ggplot()
+  geom_smooth(mapping = aes(x = LaminaWidth1,       
+                            y = LaminaLength1), 
+              method = "lm",                        
+              formula = y ~ x,                     
+              se = FALSE) + 
+  facet_wrap(~ AcceptedName)                          # Add the facet wrap on the species names
+```
+
+```{r 7}
+Fungus %>%
+  ggplot() +
+  geom_point(mapping = aes(x = ASCO2,
+                           y = BASI2))
+```
+
+```{r 8}
+Fungus %>%
+  ggplot() +
+  geom_point(mapping = aes(x = ASCO2,
+                           y = BASI2)) +
+  geom_smooth(mapping = aes(x = ASCO2,
+                            y = BASI2),
+              method = "lm",
+              formula = y ~ poly(x, 2))   # a second order polynomial, y = a + bx + c(x^2)
+                                          # as an example, a third order polynomial would be y = a + bx + c(x^2) + d(x^3)
+
+Fungus %>%
+  ggplot() +
+  geom_point(mapping = aes(x = ASCO2,
+                           y = BASI2)) +
+  geom_smooth(mapping = aes(x = ASCO2,
+                            y = BASI2),
+              method = "lm",
+              formula = y ~ log(x))       # a log relationship, y = a + b * log(x)
+
+Fungus %>%
+  ggplot() +
+  geom_point(mapping = aes(x = ASCO2,
+                           y = BASI2)) +
+  geom_smooth(mapping = aes(x = ASCO2,
+                            y = BASI2),
+              method = "lm",
+              formula = y ~ I(1 / x))     # an inverse relationship, y = a + b(1 / x)
+```
+
+```{r 9}
+# We could then test to see which of these is the best fit mathematically 
+
+# The second order polynomial 
+Fungus %>%
+  lm(formula = BASI2 ~ poly(ASCO2, 2, raw = TRUE)) %>%
+  summary()
+
+# The log relationship
+Fungus %>%
+  lm(formula = BASI2 ~ log(ASCO2)) %>%
+  summary()
+
+# The inverse relationship 
+Fungus %>%
+  lm(formula = BASI2 ~ I(1 / ASCO2)) %>%
+  summary()
+```
+
+```{r 10}
+read_csv("Sebastes_raw_morphology.csv",
+         col_names = TRUE) %>%
+  select(TL,
+         PECTLEN) %>%
+  na.omit() %>%
+  lm(formula = PECTLEN ~ TL) %>%
+  summary()
+
+read_csv("Sebastes_raw_morphology.csv",
+         col_names = TRUE) %>%
+  select(TL,
+         PECTLEN) %>%
+  na.omit() %>%
+  ggplot() +
+  geom_point(mapping = aes(x = TL,
+                           y = PECTLEN)) +
+  geom_smooth(mapping = aes(x = TL,
+                            y = PECTLEN),
+              method = "lm",
+              formula = y ~ x,
+              se = FALSE)
+```
+
+```{r session info}
+sessionInfo()
+```

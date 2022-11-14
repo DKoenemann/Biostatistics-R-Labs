@@ -1,0 +1,129 @@
+
+```{r}
+
+library(tidyverse)
+library(magrittr)
+
+```
+
+```{r 1}
+Nettows <- read_csv("nettows_info.csv",
+                    col_names = TRUE)
+
+Plastics <- read_csv("plastics_info.csv",
+                    col_names = TRUE)
+
+```
+
+```{r 2}
+Plastics %>%
+  ggplot() + 
+  geom_histogram(mapping = aes(x = Length))
+```
+
+```{r 3}
+Plastics %>%
+  ggplot() + 
+  geom_density(mapping = aes(x = Length),
+               fill = "black")
+```
+
+```{r 4}
+Plastics %>%
+  filter(NetStation < 6) %>%                      # There are a lot of net stations, so filter to keep just the first five
+  mutate(NetStation = as_factor(NetStation)) %>%  # We will also want the net stations to be treated as factors not as numbers 
+  ggplot() +                                      # Then pipe into ggplot
+  geom_density(mapping = aes(x = Length,          # Like a histogram, geom_density() only takes a single variable 
+                             group = NetStation,  # This is saying we want multiple density plots, one for each net station
+                             color = NetStation,  # We want the plot outlines to be colored according to net station
+                             fill = NetStation),  # We want the plot fill to be colored according to nest station  
+               alpha = 0.3)                       # This ranges from 0 to 1 and dictates how see-through the colors are
+```
+
+```{r 5}
+Plastics %>%
+  filter(NetStation < 11) %>%                     # There are a lot of net stations, so filter but here we can keep more 
+  mutate(NetStation = as_factor(NetStation)) %>%  # We will also want the net stations to be treated as factors not as numbers
+  ggplot() +                                      # Then pipe into ggplot
+  geom_violin(mapping = aes(x = NetStation,       # geom_violin() takes two variables, a grouping variable (x) 
+                            y = Length,           # and a distribution variable (y)
+                            color = NetStation,   # We want to color the oulines by net station
+                            fill = NetStation))   # We want to color the fill by net station
+```
+
+```{r 6}
+Plastics %>%
+  ggplot() +
+  geom_boxplot(mapping = aes(x = Type,
+                             y = Length,
+                             fill = Type))
+```
+
+```{r 7}
+Plastics %>%
+  ggplot() +
+  geom_point(mapping = aes(x = Type,
+                           y = Length,
+                           color = Colour))
+```
+
+```{r 8}
+Plastics %>%
+  ggplot() +                                    
+  geom_jitter(mapping = aes(x = Type,           # Jitter plots take a grouping variable (x)
+                            y = Length,         # and a distribution variable (y)
+                            color = Colour))    # Color the points by the color of the plastic 
+```
+
+```{r 9}
+Plastics %>%
+  filter(NetStation == 28) %>%             # We will focus on only one of the net stations
+  ggplot() +                               # Pipe into ggplot as usual
+  geom_bar(mapping = aes(x = Replicate,    # You provide a grouping variable (x) 
+                         fill = Type))     # And the variable that you want counted by the bars (fill)
+```
+
+```{r 10}
+Plastics %>%
+  filter(NetStation == 28) %>%
+  ggplot() +
+  geom_bar(mapping = aes(x = Replicate, 
+                         fill = Type),
+           position = "dodge")          # By adding this position = "dodge" option, each type will get its own bar
+```
+
+```{r 11}
+Plastics %>%
+  filter(NetStation == 28) %>%
+  ggplot() +
+  geom_bar(mapping = aes(x = Replicate, 
+                         fill = Type),
+           position = "fill")            # The position = "fill" option make each bar full with the types given as proportions of the whole
+```
+
+```{r 12}
+Nettows
+
+Nettows %>%
+  rename(TripName = "# VesselTripName") %>%
+  ggplot() +
+  geom_violin(mapping = aes(x = TripName,
+                            y = TotalPlastics,
+                            color = TripName,
+                            fill = TripName)) + 
+  coord_flip()
+
+
+Nettows %>%
+  mutate(WindSpeed = as_factor(WindSpeed)) %>%
+  ggplot() +
+  geom_bar(mapping = aes(x = CollectedBy,
+                         fill = WindSpeed),
+           position = "fill") +
+  coord_flip()
+
+```
+
+```{r}
+sessionInfo()
+```

@@ -1,0 +1,101 @@
+
+```{r libraries}
+
+library(tidyverse)
+library(magrittr)
+install.packages("maps")
+library(maps)
+
+```
+
+```{r 1}
+
+MonarchData <- read_csv("MonarchData.csv",
+                        col_names = TRUE)
+
+MonarchData
+```
+
+```{r 2}
+
+USMap <- map_data("state")
+
+MonarchData %>%
+  ggplot() +
+  geom_map(data = USMap,
+           map = USMap,
+           aes(x = long,
+               y = lat,
+               map_id = region),
+           col = "white",
+           fill = "grey") +
+  geom_point(mapping = aes(x = MarchLong,
+                           y = MarchLat)) +
+  geom_point(mapping = aes(x = AprilLong,
+                           y = AprilLat),
+             color = "blue") +
+  geom_point(mapping = aes(x = MayLong,
+                           y = MayLat),
+             color = "green") +
+  geom_point(mapping = aes(x = JuneLong,
+                           y = JuneLat),
+             color = "red") +
+  geom_point(mapping = aes(x = JulyLong,
+                           y = JulyLat),
+             color = "yellow")
+
+```
+
+```{r 3}
+
+GPS_Distance <- function(long1, lat1, long2, lat2) {
+  
+  delta_long <- long2-long1
+  delta_lat <- lat2 - lat1
+  
+  a <- delta_long*50
+  b <- delta_lat*69
+  
+  c <- sqrt((a^2) + (b^2))
+  
+  return(c)
+  
+}
+
+```
+
+```{r 4}
+
+GPS_Distance (lat1 = 19.4,
+              long1 = -100.1,
+              lat2 = 29.8,
+              long2 = -95.4)
+
+```
+
+```{r 5}
+MonarchData <- MonarchData %>%
+  select(AprilLat,
+         AprilLong,
+         JuneLat,
+         JuneLong) %>%
+  mutate(Distance = GPS_Distance(lat1 = AprilLat,
+                                 long1 = AprilLong,
+                                 lat2 = JuneLat,
+                                 long2 = JuneLong))
+
+MonarchData
+
+```
+
+```{r 6}
+
+source("GeoToolsScript.R")
+
+```
+
+```{r session info}
+
+sessionInfo()
+
+```

@@ -1,0 +1,106 @@
+
+```{r libraries}
+
+library(tidyverse)
+library(magrittr)
+
+```
+
+```{r 1}
+
+IrisData <- read_csv("Iris.csv", 
+         col_names = TRUE)
+
+IrisData
+```
+
+```{r 2}
+
+str(IrisData)
+
+```
+
+```{r 3}
+
+summary(IrisData)
+
+```
+
+```{r 4}
+
+IrisData %>%
+  summary()
+
+```
+
+```{r 5}
+
+IrisData %>%
+  mutate(PetalRatio = (Petal.Length / Petal.Width))
+
+```
+
+```{r 6}
+
+IrisData %>%
+  mutate(Species = as_factor(Species))
+
+```
+
+```{r 6.5}
+
+IrisData %>%
+  rename("SpeciesName" = "Species")
+
+```
+
+```{r 7}
+
+read_csv("Iris.csv",                                 # These first two lines read in the data
+         col_names = TRUE) %>%                       # The data have column names, then we pipe to the next function
+  mutate(PetalRatio = (Petal.Length / Petal.Width),  # This creates the petal ratio variable
+         Species = as_factor(Species)) %>%           # This changes the species variable to a factor variable, then pipe again
+  rename("SpeciesName" = "Species") %>%              # Change the name of the species variable, then pipe again
+    summary()                                        # Now we ask for the summary 
+
+```
+
+```{r 8}
+
+IrisData
+
+```
+
+```{r 9}
+
+# Notice that I got rid of the summary() at the end. If that was there, all we would be saving is the summary. 
+# Instead, we want to save the modified Tibble itself
+
+IrisData_2 <- read_csv("Iris.csv",                                
+         col_names = TRUE) %>%                       
+  mutate(PetalRatio = (Petal.Length / Petal.Width),  
+         Species = as_factor(Species)) %>%
+  rename("SpeciesName" = "Species")
+
+IrisData_2
+```
+
+```{r 10}
+
+Lab1data2 <- read_csv("lab1data2.csv", 
+                      col_names = FALSE)
+
+
+Lab1data2 %>%
+  mutate(X2 = as_factor(X2),
+         X3 = as_factor(X3)) %>%
+  rename("ID Number" = "X1",
+         "Class" = "X2",
+         "Model" = "X3") %>%
+  summary()
+
+read_csv("ToothGrowth.csv",
+         col_names = TRUE) %>%
+  mutate(supp = as_factor(supp)) %>%
+  summary()
+```

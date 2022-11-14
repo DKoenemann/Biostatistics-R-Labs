@@ -1,0 +1,271 @@
+
+```{r}
+
+library(tidyverse)
+library(magrittr)
+
+```
+
+```{r 1}
+Fungus <- read_csv("Dryad_Eldridge_Ecology.csv",
+                   col_names = TRUE) %>%
+  select(Community,
+         Site,
+         Patch,
+         Plant_Cov,
+         PlantRich,
+         pH,
+         Cow,
+         Sheep,
+         Roo,
+         Rabb,
+         ACTINO2:FungalShannons) %>%
+  rename(PercentPlantCover = Plant_Cov,
+         PlantRichness = PlantRich,
+         CowDung = Cow,
+         SheepDung = Sheep,
+         KangarooDung = Roo,
+         RabbitDung = Rabb,
+         ActinobacterialAbundance = ACTINO2,
+         AlphaproteobacterialAbundance = AlphaProteo2,
+         BacterialRichness = BacterialShannons,
+         AscomycetesAbundance = ASCO2,
+         BasidiomycetesAbundance = BASI2,
+         FungalRichness = FungalShannons) %>%
+  mutate(Community = as_factor(Community),
+         Site = as_factor(Site),
+         Patch = as_factor(Patch))
+
+Fungus %>%
+  str()
+```
+
+```{r 2}
+FishData <- read_csv("Sebastes_raw_morphology.csv") %>%
+  rename(BodyLength = "TL",
+         BodyWidth = "INTOPERC",
+         EyeWidth = "EYEWID",
+         UpperJawLength = "UPPJAW",
+         LowerJawLength = "LOWJAW",
+         GillRakers = "RAKENUM",
+         RakerLength = "RAKELEN",
+         PectoralFinLength = "PECTLEN",
+         PectoralFinWidth = "PECTHT") %>%
+  select(sampleID,
+         Species,
+         CommonName,
+         BodyLength,
+         BodyWidth,
+         EyeWidth,
+         UpperJawLength,
+         LowerJawLength,
+         GillRakers,
+         RakerLength,
+         PectoralFinLength,
+         PectoralFinWidth) %>%
+  mutate(Species = as_factor(Species),
+         CommonName = as_factor(CommonName),
+         NumObs = 1)
+
+FishData %>% 
+  group_by(CommonName) %>%
+  summarize(Obs = sum(NumObs)) %>%
+  filter(Obs > 10) %>%
+  arrange(desc(Obs))
+
+FishData <- FishData %>%
+  mutate(Desired = str_replace_all(CommonName, c("COPPER" = "1",
+                                                 "BLACK" = "1",
+                                                 "BLUE" = "1",
+                                                 "CANARY" = "1",
+                                                 "VERMILLION" = "1",
+                                                 "BANK" = "1",
+                                                 "BROWN" = "1",
+                                                 "YELLOWTAIL" = "1",
+                                                 "GREENSTRIPE" = "1",
+                                                 "PINKROSE" = "1")),
+         Desired = as.numeric(Desired)) %>%
+  filter(Desired == 1) %>%
+  mutate(Species = as_factor(Species),
+         CommonName = as_factor(CommonName)) %>%
+  select(-NumObs,
+         -Desired)
+
+FishData %>%
+  summary()
+```
+
+```{r 3}
+Fungus
+```
+
+```{r 4}
+FishData
+```
+
+```{r 5}
+FishData %>%
+  ggplot() +
+  geom_point(mapping = aes(x = UpperJawLength,
+                           y = LowerJawLength))
+```
+
+```{r 6}
+FishData
+```
+
+```{r 7}
+FishData %>%
+  select(UpperJawLength,
+         LowerJawLength, 
+         CommonName) %>%
+  na.omit() %>%
+  ggplot() +
+  geom_point(mapping = aes(x = UpperJawLength,
+                           y = LowerJawLength))
+```
+
+```{r 8}
+FishData %>%
+  select(UpperJawLength,
+         LowerJawLength,
+         CommonName) %>%
+  na.omit() %>%
+  ggplot() +
+  geom_point(mapping = aes(x = UpperJawLength,
+                           y = LowerJawLength),
+             color = "red")                         # Notice the position of the color option, outside of the aes()
+```
+
+```{r 9}
+FishData %>%
+  select(UpperJawLength,
+         LowerJawLength,
+         CommonName) %>%
+  na.omit() %>%
+  ggplot() +
+  geom_point(mapping = aes(x = UpperJawLength,
+                           y = LowerJawLength,
+                           color = CommonName))
+```
+
+```{r 10}
+FishData %>%
+  select(UpperJawLength,
+         LowerJawLength,
+         CommonName) %>%
+  na.omit() %>%
+  ggplot() +
+  geom_point(mapping = aes(x = UpperJawLength,
+                           y = LowerJawLength,
+                           color = CommonName)) +
+  coord_flip()
+```
+
+```{r 11}
+FishData %>%
+  select(GillRakers,
+         RakerLength,
+         CommonName) %>%
+  na.omit() %>%
+  ggplot() +
+  geom_boxplot(mapping = aes(x = CommonName,
+                           y = GillRakers,
+                           fill = CommonName))
+```
+
+```{r 12}
+FishData %>%
+  select(GillRakers,
+         RakerLength,
+         CommonName) %>%
+  na.omit() %>%
+  ggplot() +
+  geom_boxplot(mapping = aes(x = CommonName,
+                           y = GillRakers,
+                           fill = CommonName)) + 
+  coord_flip()
+```
+
+```{r 13}
+Fungus %>%
+  ggplot() +
+  geom_point(mapping = aes(x = BasidiomycetesAbundance,
+                           y = AscomycetesAbundance))
+```
+
+```{r 14}
+Fungus %>%
+  ggplot() +
+  geom_point(mapping = aes(x = BasidiomycetesAbundance,
+                           y = AscomycetesAbundance)) +
+  facet_wrap(~ Patch)                                      # Facet wrap based on the Patch type, the tilde (~) is necessary
+```
+
+```{r 15}
+Fungus %>%
+  ggplot() +
+  geom_point(mapping = aes(x = BasidiomycetesAbundance,
+                           y = AscomycetesAbundance)) +
+  facet_grid(Community ~ Patch)                               # Facet grid on the Patch type and community, the tilde (~) is necessary
+```
+
+```{r 16}
+Fungus %>%
+  ggplot() +
+  geom_point(mapping = aes(x = BasidiomycetesAbundance,   # x axis shows the basidiomycete abundance
+                           y = AscomycetesAbundance,      # y axis shows the ascomycete abundance
+                           size = PercentPlantCover,      # the size of the point indicates the plant abundance at that observation
+                           color = PlantRichness)) +      # the color of the point indicates the plant richness at that observation
+  facet_grid(Community ~ Patch)                           # facet by both community and patch to get a grid of 12 plots 
+
+```
+
+```{r 17}
+FishData %>%
+  select(UpperJawLength,
+         LowerJawLength,
+         CommonName) %>%
+  na.omit() %>%
+  ggplot() +
+  geom_point(mapping = aes(x = UpperJawLength,
+                           y = LowerJawLength,
+                           color = CommonName)) +
+  labs(y = "Lower Jaw Length (cm)",                               # Label for the y axis
+       x = "Upper Jaw Length (cm)",                               # Label for the x axis
+       color = "Common Name",                                     # Label the color legend/key (color = or fill = depending on geom settings)
+       title = "Jaw Dimensions in Sebastes (Rock Fishes)",        # Title for the plot
+       subtitle = "Including Ten Species ",                       # Subtitle for the plot 
+       caption = "Ingram and Kai 2014 (doi:10.5061 Dryad.s5s3s)") # Caption label, at bottom right of the plot 
+```
+
+```{r 18}
+IrisData <- read_csv("Iris.csv",
+                     col_names = TRUE)
+
+IrisData %>%
+  ggplot() +
+  geom_point(mapping = aes(x = Sepal.Length,
+                           y = Sepal.Width,
+                           color = Species))
+
+read_csv("ToothGrowth.csv",
+         col_names = TRUE) %>%
+  mutate(dose = as_factor(dose)) %>%
+  ggplot() +
+  geom_boxplot(mapping = aes(x = dose,
+                             y = len),
+               fill = "maroon") +
+  facet_wrap(~ supp) +
+  labs(y = "Tooth Length", 
+       x = "Supplement Dose",     
+       title = "Guinea Pig Tooth Length Growth",
+       subtitle = "Based on Two Different Supplements",              
+       caption = "R Data Set")
+```
+
+```{r session info}
+
+sessionInfo()
+
+```

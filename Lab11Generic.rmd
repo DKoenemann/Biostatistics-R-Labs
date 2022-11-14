@@ -1,0 +1,87 @@
+
+```{r}
+
+library(tidyverse)
+library(magrittr)
+
+```
+
+```{r 1}
+Nettows <- read_csv("nettows_info.csv",
+                    col_names = TRUE)
+
+Flowers <- read_csv("Flowers.csv",
+                    col_names = TRUE)
+
+Triplaris <- read_csv("Triplaris_Data.csv",
+                      col_names = TRUE)
+```
+
+```{r 2}
+Nettows %>%                               # Pipe in the data
+  pivot_longer(cols = c("TotalPlastics",  # The names of the columns that I want to combine, given as a vector c() 
+                        "DriftingWood", 
+                        "Pumice"), 
+               names_to = "ObjectType",   # The name of the new column where the old column names will go
+               values_to = "Count")       # The name of the new column where the values from the old columns will go 
+```
+
+```{r 3}
+Nettows %>%                           
+  pivot_longer(cols = c("TotalPlastics", 
+                        "DriftingWood", 
+                        "Pumice"), 
+               names_to = "ObjectType",
+               values_to = "Count") %>%
+  mutate(ObjectType = as_factor(ObjectType)) %>%
+  ggplot() +
+  geom_jitter(mapping = aes(x = NetTypeMeshSizeDimensionsNetMouth,
+                            y = Count,
+                            color = ObjectType)) + 
+  coord_flip()
+```
+
+```{r 4}
+Flowers %>%                             # Pipe in the data
+  pivot_wider(names_from = "Variable",  # The column I would like to spread out, this column contains what will be the names of my new columns 
+              values_from = "Value")    # This column contains the values that will go into my new columns 
+
+```
+
+```{r 5}
+Nettows %>%
+  separate(col = CollectedBy,         # The column I want to split up 
+           into = c("CrewMember1",    # The name of one of the new columns
+                    "CrewMember2"),   # The name of the another of the new columns, there may be many 
+           sep = ",")                 # The character that separates the pieces of information 
+```
+
+```{r 6}
+Nettows2 <- Nettows %>%                   # First we need to save our separated data frame as a new object 
+  separate(col = CollectedBy, 
+           into = c("CrewMember1",
+                    "CrewMember2"), 
+           sep = ",")
+
+Nettows2 %>%                              # Pipe in the data
+  replace_na(list(CrewMember2 = "None"))  # inside of list() give the variable and then what NAs in that variable should be replaced with 
+
+```
+
+```{r 7}
+Triplaris %>%
+  pivot_longer(cols = c("PetioleLength1",
+                        "PetioleLength2",
+                        "PetioleLength3"),
+               names_to = "Replicate",
+               values_to = "Length")
+
+
+Triplaris %>%
+  replace_na(list(Habit = "Not Recorded"))
+
+```
+
+```{r session info}
+sessionInfo()
+```

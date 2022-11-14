@@ -1,0 +1,169 @@
+
+```{r load libraries}
+
+library(tidyverse)
+library(magrittr)
+
+```
+
+```{r 1}
+
+nettows <- read_csv("nettows_info.csv",
+                    col_names = TRUE)
+
+nettows %>%
+  str()
+```
+
+```{r 2}
+
+nettows %>%
+  select(NetStation,
+         Replicate,
+         Duration,
+         NetTypeMeshSizeDimensionsNetMouth,
+         VesselSpeed:Pumice)                 # The Var1:Var12 indicates to select all variables between Var1 and Var12
+
+```
+
+```{r 3}
+
+nettows2 <- nettows %>%
+  select(NetStation,
+         Replicate,
+         Duration,
+         NetTypeMeshSizeDimensionsNetMouth,
+         VesselSpeed:Pumice)                
+
+nettows2
+```
+
+```{r 4}
+
+nettows2 <- nettows2 %>%     # Our new data object has the same name as the current data object, which means it will save over it
+  select(-StartFlowmeter,    # Note that here we have to list the variables invidually
+         -EndFlowmeter,
+         -Flow)
+
+nettows2
+```
+
+```{r 5}
+
+nettows2 %>%
+  filter(Duration > 15)
+
+```
+
+```{r 6}
+
+nettows2 %>%
+  filter(SeaTemperature < 16)
+
+```
+
+```{r 7}
+
+nettows2 %>%
+  filter(NetTypeMeshSizeDimensionsNetMouth == "Neuston/ 335/ 1.2 x 0.6",
+         WindSpeed < 10)
+
+```
+
+```{r 8}
+
+nettows2 %>%
+  select(NetStation,
+         Replicate,
+         TotalPlastics) %>%
+  arrange(TotalPlastics)
+
+```
+
+```{r 9}
+
+nettows2 %>%
+  select(NetStation,
+         Replicate,
+         TotalPlastics) %>%
+  arrange(desc(TotalPlastics))
+
+```
+
+```{r 10}
+
+nettows2 %>%
+  group_by(NetTypeMeshSizeDimensionsNetMouth)
+
+```
+
+```{r 11}
+
+nettows2 %>%
+  group_by(NetTypeMeshSizeDimensionsNetMouth) %>%  # First we need to group by the net-type variable
+  summarize(MeanPlastics = mean(TotalPlastics))            # Then we want the mean of TotalPlastics to be calculated for each net-type
+
+```
+
+```{r 12}
+
+nettows2 %>%                                          # Pipe in the data 
+  group_by(NetTypeMeshSizeDimensionsNetMouth) %>%     # Group by the kind of net used
+  summarise(MeanPerNet = mean(TotalPlastics),         # Calculate the mean of the TotalPlastics variable
+            MedianPerNet = median(TotalPlastics),     # Calculate the median of the TotalPlastics variable
+            MaxPerNet = max(TotalPlastics),           # Calculate the maximum of the TotalPlastics variable
+            MinPerNet = min(TotalPlastics))           # Calculate the minimum of the TotalPlastics variable 
+
+```
+
+```{r 13}
+
+nettows2 %>%                                                   # Pipe in the data
+  group_by(NetStation,                                         # Group first by the net-type
+           NetTypeMeshSizeDimensionsNetMouth) %>%              # Then, within net-type, group by the net station 
+  summarize(MeanPerStationAndNet = mean(TotalPlastics),        # For those groups calculate the mean 
+            MedianPerStationAndNet = median(TotalPlastics),    # For those groups calculate the median 
+            MaxPerStationAndNet = max(TotalPlastics),          # For those groups calculate tha maximum
+            MinPerStationAndNet = min(TotalPlastics)) %>%      # For those groups calculate the minimum
+  arrange(desc(MedianPerStationAndNet),                        # Arrange the resulting rows in descending order first by the median
+          desc(MeanPerStationAndNet)) %>%                      # Then in descending order by mean     
+  ungroup()                                                    # Ungroup the variables 
+
+```
+
+```{r 14}
+
+nettows %>%
+  select("NetStation",
+         "WindSpeed",
+         "SeaTemperature",
+         "Salinity",
+         "Depth") %>%
+  filter(NetStation < 14) %>%
+  group_by(NetStation) %>%
+  summarize(MeanWind = mean(WindSpeed)) %>%
+  arrange(MeanWind)
+
+
+
+read_csv("Triplaris_data.csv",
+         col_names = TRUE) %>%
+  select(ID, 
+         AcceptedName,
+         Country,
+         PetioleLength1) %>%
+  rename("PetioleLength" = PetioleLength1,
+         "SpeciesName" = AcceptedName) %>%
+  filter(!is.na(PetioleLength)) %>%
+  group_by(Country,
+           SpeciesName) %>%
+  summarise(MaxLength = max(PetioleLength)) %>%
+  arrange(desc(MaxLength))
+  
+```
+
+```{r session info}
+
+sessionInfo()
+
+```

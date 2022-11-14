@@ -1,0 +1,139 @@
+
+```{r libraries}
+
+library(tidyverse)
+library(magrittr)
+
+```
+
+```{r 1}
+Fungus <- read_csv("Dryad_Eldridge_Ecology.csv",
+                   col_names = TRUE)
+
+Fungus
+```
+
+```{r 2}
+# Checking the sample size
+Fungus %>%
+  mutate(Community = as_factor(Community)) %>%
+  select(Community) %>%
+  summary()
+
+```
+
+```{r 3}
+# Checking the variances 
+
+var(Fungus$NAG[Fungus$Community == "Blackbox"])
+var(Fungus$NAG[Fungus$Community == "Cypress"])
+var(Fungus$NAG[Fungus$Community == "Redgum"])
+
+```
+
+```{r 4}
+Fungus %>%
+  ggplot() +
+  geom_histogram(mapping = aes(x = NAG)) + 
+  facet_wrap(~ Community)
+```
+
+```{r 5}
+Fungus %>%
+  ggplot(aes(sample = NAG)) +  # Indicate which of the variables to plot in the qq plot
+  geom_qq() +                  # geom_qq does not need any more information for the plotting
+  geom_qq_line() +             # This also adds the straight line to make the assessment easier
+  facet_wrap(~ Community)      # We will facet wrap by community
+```
+
+```{r 6}
+Fungus %>%
+  mutate(LogNAG = log(NAG)) %>%
+  select(Community,
+         NAG,
+         LogNAG)
+```
+
+```{r 7}
+Fungus %>%
+  mutate(LogNAG = log(NAG)) %>%
+  select(Community,
+         NAG,
+         LogNAG) %>%
+  ggplot() +
+  geom_histogram(mapping = aes(x = LogNAG)) +
+  facet_wrap(~ Community)
+```
+
+```{r 8}
+Fungus %>%
+  mutate(LogNAG = log(NAG)) %>%
+  ggplot(aes(sample = LogNAG)) +
+  geom_qq() +
+  geom_qq_line() +
+  facet_wrap(~ Community)
+```
+
+```{r 9}
+FungusLog <- Fungus %>%          # We need to create a new data object with the log transformed data
+  mutate(LogNAG = log(NAG)) %>%  # Make a new variable with the log tansform
+  select(Community,              # Select only the two variables we will need
+         LogNAG) %>%
+  filter(LogNAG > 0)             # Filter out the undefined values 
+
+t.test(x = FungusLog$LogNAG[FungusLog$Community == "Blackbox"],
+       y = FungusLog$LogNAG[FungusLog$Community == "Redgum"],
+       alternative = "two.sided",
+       conf.level = 0.95)
+```
+
+```{r 10}
+
+Fungus <- read_csv("Dryad_Eldridge_Ecology.csv",
+                   col_names = TRUE)
+
+# compare basidiomycete abundance between the three communities 
+
+FungusBasi <- Fungus %>%
+    mutate(LogBasi = log(BASI2)) %>%
+  select(Community, 
+         LogBasi)
+
+var(Fungus$BASI2[Fungus$Community == "Blackbox"])
+var(Fungus$BASI2[Fungus$Community == "Cypress"])
+var(Fungus$BASI2[Fungus$Community == "Redgum"])
+
+Fungus %>%
+  ggplot() +
+  geom_histogram(mapping = aes(x = BASI2)) + 
+  facet_wrap(~ Community)
+
+Fungus %>%
+  ggplot(aes(sample = BASI2)) +
+  geom_qq() +
+  geom_qq_line() +
+  facet_wrap(~ Community)
+
+Fungus %>%
+  mutate(LogBasi = log(BASI2)) %>%
+  ggplot() +
+  geom_histogram(mapping = aes(x = LogBasi)) +
+  facet_wrap(~ Community)
+
+Fungus %>%
+  mutate(LogBasi = log(BASI2)) %>%
+  ggplot(aes(sample = LogBasi)) +
+  geom_qq() +
+  geom_qq_line() +
+  facet_wrap(~ Community)
+
+t.test(x = FungusBasi$LogBasi[FungusBasi$Community == "Blackbox"],
+       y = FungusBasi$LogBasi[FungusBasi$Community == "Cypress"],
+       alternative = "two.sided",
+       conf.level = 0.95)
+
+```
+
+```{r session info}
+sessionInfo()
+```

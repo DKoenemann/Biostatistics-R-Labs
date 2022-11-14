@@ -1,0 +1,75 @@
+
+```{r}
+
+library(tidyverse)
+library(magrittr)
+
+```
+
+```{r 1}
+
+TriplarisData <- read_csv("Triplaris_Data.csv",
+                          col_names = TRUE)
+
+TriplarisData
+
+```
+
+```{r 2}
+
+install.packages("mclust")
+library(mclust)
+
+```
+
+```{r 3}
+
+TriplarisData <- TriplarisData %>%
+  filter(AcceptedName == "Triplaris americana") %>%
+  select(ID,
+         LaminaWidth1,
+         LaminaLength1,
+         PetioleLength1,
+         LeafPubesenceLength1,
+         BractioleLength1) %>%
+  na.omit() %>%
+  column_to_rownames(var = "ID")
+
+TriplarisData
+
+```
+
+```{r 4}
+
+TriplarisMclust <- Mclust(TriplarisData)
+
+TriplarisMclust
+
+```
+
+```{r 5}
+
+summary(TriplarisMclust)
+
+```
+
+```{r 6}
+
+TriplarisMclust$classification
+
+```
+
+```{r 7}
+
+plot(TriplarisMclust,
+     what = "classification")
+
+```
+
+```{r sessioninfo}
+
+sessionInfo()
+
+```
+
+

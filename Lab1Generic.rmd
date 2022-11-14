@@ -1,0 +1,12 @@
+
+```{r}
+
+install.packages("tidyverse")
+install.packages("magrittr")
+install.packages("data.table")
+install.packages("rmarkdown")
+install.packages("knitr")
+install.packages("kableExtra")
+install.packages("tinytex")
+
+```
